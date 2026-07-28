@@ -1,0 +1,37 @@
+on:
+  workflow_call:
+    inputs:
+      solution_path:
+        required: false
+        type: string
+        default: "."
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore "${{ inputs.solution_path }}"
+
+      - name: Build
+        run: dotnet build "${{ inputs.solution_path }}" --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test "${{ inputs.solution_path }}" --configuration Release --no-build --logger trx --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults

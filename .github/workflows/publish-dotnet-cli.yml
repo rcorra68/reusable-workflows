@@ -10,13 +10,21 @@ on:
       artifact_name:
         required: true
         type: string
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+      dotnet_version:
+        required: false
+        type: string
+        default: "8.0.x"
 
 permissions:
   contents: write
 
 jobs:
   tag:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     outputs:
       version: ${{ steps.nbgv.outputs.version }}
       tag: ${{ steps.nbgv.outputs.tag }}
@@ -35,7 +43,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Restore local tools
         run: dotnet tool restore
@@ -93,7 +101,7 @@ jobs:
   build:
     needs: tag
     if: needs.tag.outputs.tag_exists == 'false'
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     strategy:
       matrix:
         rid: ${{ fromJson(inputs.runtimes) }}
@@ -107,7 +115,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Publish
         run: |
@@ -119,6 +127,7 @@ jobs:
             /p:PublishSingleFile=true
 
       - name: Package for release
+        shell: bash
         run: |
           cd out-${{ matrix.rid }}
           zip -r "../${{ inputs.artifact_name }}-${{ needs.tag.outputs.tag }}-${{ matrix.rid }}.zip" .
@@ -132,7 +141,7 @@ jobs:
   release:
     needs: [tag, build]
     if: needs.tag.outputs.tag_exists == 'false'
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

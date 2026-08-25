@@ -13,6 +13,14 @@ on:
         required: false
         type: string
         default: "release"
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+      dotnet_version:
+        required: false
+        type: string
+        default: "8.0.x"
 
 permissions:
   contents: write
@@ -20,7 +28,7 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Checkout full history
         uses: actions/checkout@v4
@@ -35,7 +43,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Restore local tools
         run: dotnet tool restore

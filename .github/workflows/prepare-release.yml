@@ -36,6 +36,7 @@ jobs:
           fetch-depth: 0
 
       - name: Configure Git Identity
+        shell: bash
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
@@ -46,6 +47,7 @@ jobs:
           dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Restore local tools
+        shell: bash
         run: dotnet tool restore
 
       - name: Determine version bump
@@ -92,10 +94,12 @@ jobs:
 
       - name: Set version in version.json
         if: steps.bump.outputs.bump != 'none'
+        shell: bash
         run: dotnet tool run nbgv -- set-version ${{ steps.version.outputs.version }}
 
       - name: Build and Test
         if: steps.bump.outputs.bump != 'none'
+        shell: bash
         run: |
           dotnet restore "${{ inputs.solution_path }}"
           dotnet build "${{ inputs.solution_path }}" --configuration Release --no-restore
@@ -103,6 +107,7 @@ jobs:
 
       - name: Create or update release branch
         if: steps.bump.outputs.bump != 'none'
+        shell: bash
         run: |
           BRANCH_NAME="${{ inputs.release_branch_prefix }}/${{ steps.version.outputs.version }}"
           git checkout -B "$BRANCH_NAME"
@@ -119,6 +124,7 @@ jobs:
 
       - name: Create or update PR
         if: steps.bump.outputs.bump != 'none'
+        shell: bash
         run: |
           BRANCH_NAME="${{ inputs.release_branch_prefix }}/${{ steps.version.outputs.version }}"
           EXISTING_PR=$(gh pr list --base "${{ inputs.base_branch }}" --head "$BRANCH_NAME" --json number --jq '.[0].number')

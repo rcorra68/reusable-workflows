@@ -18,6 +18,10 @@ on:
         required: false
         type: string
         default: "8.0.x"
+      develop_branch:
+        required: false
+        type: string
+        default: "develop"
 
 permissions:
   contents: write
@@ -133,11 +137,18 @@ jobs:
             -o out-${{ matrix.rid }} \
             -p:PublishSingleFile=true
 
-      - name: Package for release
+      - name: Package for release (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           cd out-${{ matrix.rid }}
           zip -r "../${{ inputs.artifact_name }}-${{ needs.tag.outputs.tag }}-${{ matrix.rid }}.zip" .
+
+      - name: Package for release (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "out-${{ matrix.rid }}\*" -DestinationPath "${{ inputs.artifact_name }}-${{ needs.tag.outputs.tag }}-${{ matrix.rid }}.zip" -Force
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -167,3 +178,27 @@ jobs:
             --notes-file artifacts/release-notes/RELEASE_NOTES.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sync-develop:
+    needs: [tag, release]
+    if: needs.tag.outputs.tag_exists == 'false'
+    runs-on: ${{ inputs.runs_on }}
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.develop_branch }}
+          fetch-depth: 0
+
+      - name: Configure Git Identity
+        shell: bash
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Merge main back into develop
+        shell: bash
+        run: |
+          git fetch origin main
+          git merge origin/main --no-edit
+          git push origin "${{ inputs.develop_branch }}"

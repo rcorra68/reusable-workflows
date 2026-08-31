@@ -131,7 +131,7 @@ jobs:
             -r ${{ matrix.rid }} \
             --self-contained true \
             -o out-${{ matrix.rid }} \
-            /p:PublishSingleFile=true
+            -p:PublishSingleFile=true
 
       - name: Package for release
         shell: bash

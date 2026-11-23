@@ -137,15 +137,15 @@ jobs:
               --base "${{ inputs.base_branch }}" \
               --head "$BRANCH_NAME" \
               --title "chore(release): v${{ steps.version.outputs.version }}" \
-              --body "🚀 **Anteprima release**
+              --body "🚀 **Release preview**
 
-          - **Versione prevista:** ${{ steps.version.outputs.version }}
-          - **Tipo di bump:** ${{ steps.bump.outputs.bump }}
+          - **Version:** ${{ steps.version.outputs.version }}
+          - **Bump:** ${{ steps.bump.outputs.bump }}
 
           ### Changelog
           $PREVIEW
 
-          Il tag effettivo, il CHANGELOG.md definitivo e la pubblicazione del binario vengono creati automaticamente al merge di questa PR su \`${{ inputs.base_branch }}\`."
+          The tag, the final CHANGELOG.md and the release binaries are created automatically when this PR is merged into \`${{ inputs.base_branch }}\`."
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <!-- Modern defaults (remove for .NET Framework projects) -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Versioning driven by version.json (Nerdbank.GitVersioning) -->
+    <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
+      <PrivateAssets>all</PrivateAssets>
+      <Version>3.10.91</Version>
+    </PackageReference>
+  </ItemGroup>
+</Project>

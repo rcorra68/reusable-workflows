@@ -29,6 +29,8 @@ chore/*   ─┘
 - A commit already pushed to a shared branch is never amended or force-pushed: fix it with a new commit.
 - Delete branches after merge.
 
+Exception: this repository (`reusable-workflows`) has no releases and no `develop`: branches and PRs go straight to `main`. Callers use `@main`, so every merge affects all projects immediately.
+
 Branch names: `<type>/<short-description>` in kebab-case, using the commit types below (`feat/upcoming-expirations`, `fix/csv-encoding`, `docs/readme`).
 
 ## 📝 Commits

@@ -6,7 +6,7 @@ on:
         type: string
       runtimes:
         required: true
-        type: string   # es. '["linux-x64"]' oppure '["linux-x64","win-x64"]'
+        type: string   # e.g. '["linux-x64"]' or '["linux-x64","win-x64"]'
       artifact_name:
         required: true
         type: string

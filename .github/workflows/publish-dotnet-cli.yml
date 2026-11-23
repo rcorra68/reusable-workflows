@@ -22,6 +22,16 @@ on:
         required: false
         type: string
         default: "develop"
+      self_contained:
+        description: "Bundle the .NET runtime (set to false for .NET Framework projects)"
+        required: false
+        type: boolean
+        default: true
+      single_file:
+        description: "Publish as a single executable (not supported by .NET Framework)"
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -133,9 +143,9 @@ jobs:
           dotnet publish "${{ inputs.project_path }}" \
             -c Release \
             -r ${{ matrix.rid }} \
-            --self-contained true \
+            --self-contained ${{ inputs.self_contained }} \
             -o out-${{ matrix.rid }} \
-            -p:PublishSingleFile=true
+            -p:PublishSingleFile=${{ inputs.single_file }}
 
       - name: Package for release (Unix)
         if: runner.os != 'Windows'
